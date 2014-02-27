@@ -1,4 +1,3 @@
-require 'pry'
 module Ralipay
 
   require 'ralipay/version'
