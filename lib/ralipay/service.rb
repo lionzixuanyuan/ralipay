@@ -75,7 +75,7 @@ class Service
     @@my_sign = Ralipay::Common::build_sign sort_array
     #创建POST请求数据串
     @@req_data = Ralipay::Common::create_link_string(sort_array).to_s \
-               + '&sign='                                              \
+               + '&sign='                                             \
                + CGI::escape(@@my_sign)
     #请求支付宝接口
     uri  = URI.parse (@@gateway_order)
@@ -151,7 +151,7 @@ class Service
     #生成跳转链接
     redirect_url = @@gateway_order                                  \
                  + Ralipay::Common::create_link_string(@@parameter) \
-                 + '&sign='                                          \
+                 + '&sign='                                         \
                  + CGI::escape(@@my_sign)
     return redirect_url
   end

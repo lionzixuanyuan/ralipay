@@ -27,9 +27,9 @@ class Notify
     #@todo 入参合法性验证
     #此处为固定顺序，支付宝Notify返回消息通知比较特殊，这里不需要升序排列
     notify_hash = {
-        :service		 => posts[:service],
-        :v				   => posts[:v],
-        :sec_id		   => posts[:sec_id],
+        :service     => posts[:service],
+        :v           => posts[:v],
+        :sec_id      => posts[:sec_id],
         :notify_data => posts[:notify_data]
     }
     #解密notify_data
