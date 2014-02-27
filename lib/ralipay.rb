@@ -1,12 +1,10 @@
 require 'pry'
 module Ralipay
 
-  path = "/Users/weston/Downloads/ralipay/lib/"
-
-  require path + 'ralipay/version'
-  require path + 'ralipay/common'
-  require path + 'ralipay/service'
-  require path + 'ralipay/notify'
+  require 'ralipay/version'
+  require 'ralipay/common'
+  require 'ralipay/service'
+  require 'ralipay/notify'
   require 'json'
   require 'date'
   require 'nokogiri'
@@ -104,15 +102,15 @@ module Ralipay
       # token = "20140206fb8da403c21df3b131eaec0365197fff"
       #构造要请求的参数数组，无需改动
       req_hash = {
-          :req_data		   => "<auth_and_execute_req><request_token>" \
+          :req_data      => "<auth_and_execute_req><request_token>" \
                               + token                               \
                               + "</request_token></auth_and_execute_req>",
-          :service		   => $service2,
-          :sec_id		     => $sec_id,
-          :partner		   => $global_configs[:partner],
+          :service       => $service2,
+          :sec_id        => $sec_id,
+          :partner       => $global_configs[:partner],
           :call_back_url => $global_configs[:call_back_url],
-          :format		     => $format,
-          :v				     => $v
+          :format        => $format,
+          :v             => $v
       }
 
       #调用alipay_Wap_Auth_AuthAndExecute接口方法,生成支付地址
@@ -293,7 +291,7 @@ module Ralipay
       params['show_url']       = $global_configs[:merchant_url]
       params['return_url']     = $global_configs[:call_back_url]
       params['notify_url']     = $global_configs[:notify_url]
-      params['qr_pay_mode'] = "3"
+      params['qr_pay_mode']    = $global_configs[:qr_pay_mode]
       all_params = sign(params)
       all_params_kv = all_params.map do |key,value|
         key + '=' + value
