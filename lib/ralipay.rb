@@ -14,7 +14,7 @@ module Ralipay
   include Ralipay::Common
 
   #初始化参数
-  mattr_accessor :global_configs
+  mattr_accessor :global_configs, :service1, :service2, :format, :sec_id, :input_charset, :input_charset_gbk, :service_pay_channel, :v
 
   self.global_configs = {
       :secure_type   => 'MD5',
@@ -33,30 +33,30 @@ module Ralipay
   }
 
   #固定参数,无需修改
-  RaliService1            = 'alipay.wap.trade.create.direct'
-  RaliService2            = 'alipay.wap.auth.authAndExecute'
-  RaliFormat              = 'xml'
-  RaliSec_id              = 'RSA'
-  RaliInput_charset       = 'utf-8'
-  RaliInput_charset_gbk   = 'GBK'
-  RaliService_pay_channel = 'mobile.merchant.paychannel'
-  RaliV                   = '2.0'
+  self.service1            = 'alipay.wap.trade.create.direct'
+  self.service2            = 'alipay.wap.auth.authAndExecute'
+  self.format              = 'xml'
+  self.sec_id              = 'RSA'
+  self.input_charset       = 'utf-8'
+  self.input_charset_gbk   = 'GBK'
+  self.service_pay_channel = 'mobile.merchant.paychannel'
+  self.v                   = '2.0'
 
   #wap支付类
   class WapPayment
 
     def initialize(configs)
       #@todo 入参合法性验证
-      self.global_configs = self.global_configs.merge configs
+      Ralipay.global_configs = Ralipay.global_configs.merge configs
     end
 
     #生成wap支付地址
     def generate_pay_url
       params = {
-          :_input_charset => RaliInput_charset_gbk,
-          :sign_type      => RaliSec_id,
-          :service        => RaliService_pay_channel,
-          :partner        => self.global_configs[:partner],
+          :_input_charset => Ralipay.input_charset_gbk,
+          :sign_type      => Ralipay.sec_id,
+          :service        => Ralipay.service_pay_channel,
+          :partner        => Ralipay.global_configs[:partner],
           :out_user       => ''
       }
       result = Service.new.mobile_merchant_pay_channel params
@@ -72,29 +72,29 @@ module Ralipay
       #构造请求参数
       req_hash = {
           :req_data => '<direct_trade_create_req><subject>'   \
-                    + self.global_configs[:subject]               \
+                    + Ralipay.global_configs[:subject]               \
                     + '</subject><out_trade_no>'              \
-                    + self.global_configs[:out_trade_no]          \
+                    + Ralipay.global_configs[:out_trade_no]          \
                     + '</out_trade_no><total_fee>'            \
-                    + self.global_configs[:total_fee]             \
+                    + Ralipay.global_configs[:total_fee]             \
                     + "</total_fee><seller_account_name>"     \
-                    + self.global_configs[:seller_email]          \
+                    + Ralipay.global_configs[:seller_email]          \
                     + "</seller_account_name><notify_url>"    \
-                    + self.global_configs[:notify_url]            \
+                    + Ralipay.global_configs[:notify_url]            \
                     + "</notify_url><out_user>"               \
-                    + self.global_configs[:out_user]              \
+                    + Ralipay.global_configs[:out_user]              \
                     + "</out_user><merchant_url>"             \
-                    + self.global_configs[:merchant_url]          \
+                    + Ralipay.global_configs[:merchant_url]          \
                     + "</merchant_url><cashier_code>"         \
                     + "</cashier_code><call_back_url>"        \
-                    + self.global_configs[:call_back_url]         \
+                    + Ralipay.global_configs[:call_back_url]         \
                     + "</call_back_url></direct_trade_create_req>",
-          :service => RaliService1,
-          :sec_id  => RaliSec_id,
-          :partner => self.global_configs[:partner],
+          :service => Ralipay.service1,
+          :sec_id  => Ralipay.sec_id,
+          :partner => Ralipay.global_configs[:partner],
           :req_id  => DateTime.parse(Time.now.to_s).strftime('%Y%m%d%H%M%S').to_s,
-          :format  => RaliFormat,
-          :v       => RaliV
+          :format  => Ralipay.format,
+          :v       => Ralipay.v
       }
 
       #获取token
@@ -106,12 +106,12 @@ module Ralipay
           :req_data      => "<auth_and_execute_req><request_token>" \
                               + token                               \
                               + "</request_token></auth_and_execute_req>",
-          :service       => RaliService2,
-          :sec_id        => RaliSec_id,
-          :partner       => self.global_configs[:partner],
-          :call_back_url => self.global_configs[:call_back_url],
-          :format        => RaliFormat,
-          :v             => RaliV
+          :service       => Ralipay.service2,
+          :sec_id        => Ralipay.sec_id,
+          :partner       => Ralipay.global_configs[:partner],
+          :call_back_url => Ralipay.global_configs[:call_back_url],
+          :format        => Ralipay.format,
+          :v             => Ralipay.v
       }
 
       #调用alipay_Wap_Auth_AuthAndExecute接口方法,生成支付地址
@@ -121,10 +121,10 @@ module Ralipay
     def create_qrcode
       #string tmp = "https://mapi.alipay.com/gateway.do?sign_type=MD5&partner=2088101103495019&sign=ffa3e1a9708f07ad20c5229cf9815877&_input_charset=UTF-8&qrcode=%5BAlipay%5D%3A7435301335625758&service=alipay.mobile.qrcode.create&method=stop";  
       params = {
-          :_input_charset => RaliInput_charset_gbk,
+          :_input_charset => Ralipay.input_charset_gbk,
           :service        =>"alipay.mobile.qrcode.create",
           :sign_type      => "MD5",
-          :partner        => self.global_configs[:partner],
+          :partner        => Ralipay.global_configs[:partner],
           :qrcode => 'i%5BAlipay%5D%3A7435301335625758',
           :method => "createorder",
           :format => 'json'
@@ -197,7 +197,7 @@ module Ralipay
 
     def initialize(configs)
       #@todo 入参合法性验证
-      self.global_configs = self.global_configs.merge configs
+      Ralipay.global_configs = Ralipay.global_configs.merge configs
     end
 
     #异步回调验证,支付宝主动通知,前端POST xml方式获得参数,该方法只返回bool
@@ -265,14 +265,14 @@ module Ralipay
 
     def initialize(configs)
       #@todo 入参合法性验证
-      self.global_configs = self.global_configs.merge configs
+      Ralipay.global_configs = Ralipay.global_configs.merge configs
     end
 
     def sign(params)
       params_kv = params.sort.map do |kv|
         kv.join('=')
       end
-      sign = Digest::MD5.hexdigest(params_kv.join('&') + self.global_configs[:key])
+      sign = Digest::MD5.hexdigest(params_kv.join('&') + Ralipay.global_configs[:key])
       params['sign_type'] = 'MD5'
       params['sign'] = sign
       params
@@ -284,15 +284,15 @@ module Ralipay
       params['service']        = 'create_direct_pay_by_user'
       params['_input_charset'] = 'utf-8'
       params['payment_type']   = '1'
-      params['partner']        = self.global_configs[:partner]
-      params['seller_email']   = self.global_configs[:seller_email]
-      params['subject']        = self.global_configs[:subject]
-      params['out_trade_no']   = self.global_configs[:out_trade_no]
-      params['total_fee']      = self.global_configs[:total_fee]
-      params['show_url']       = self.global_configs[:merchant_url]
-      params['return_url']     = self.global_configs[:call_back_url]
-      params['notify_url']     = self.global_configs[:notify_url]
-      params['qr_pay_mode']    = self.global_configs[:qr_pay_mode]
+      params['partner']        = Ralipay.global_configs[:partner]
+      params['seller_email']   = Ralipay.global_configs[:seller_email]
+      params['subject']        = Ralipay.global_configs[:subject]
+      params['out_trade_no']   = Ralipay.global_configs[:out_trade_no]
+      params['total_fee']      = Ralipay.global_configs[:total_fee]
+      params['show_url']       = Ralipay.global_configs[:merchant_url]
+      params['return_url']     = Ralipay.global_configs[:call_back_url]
+      params['notify_url']     = Ralipay.global_configs[:notify_url]
+      params['qr_pay_mode']    = Ralipay.global_configs[:qr_pay_mode]
       all_params = sign(params)
       all_params_kv = all_params.map do |key,value|
         key + '=' + value
@@ -306,7 +306,7 @@ module Ralipay
       gets = Ralipay::Common::para_filter(gets)
       for_sign = Ralipay::Common::create_link_string(gets)
       #for_sign = CGI.unescape for_sign
-      sign == Ralipay::Common::md5_sign(for_sign + self.global_configs[:key])
+      sign == Ralipay::Common::md5_sign(for_sign + Ralipay.global_configs[:key])
     end
 
     #同步回调验证,支付后跳转,前端GET方式获得参数,传入hash symbol,该方法返回支付状态,并安全的返回回调参数hash,失败返回false
@@ -316,7 +316,7 @@ module Ralipay
       gets = Ralipay::Common::para_filter(gets)
       for_sign = Ralipay::Common::create_link_string(gets)
       #for_sign = CGI.unescape for_sign
-      if sign == Ralipay::Common::md5_sign(for_sign + self.global_configs[:key])
+      if sign == Ralipay::Common::md5_sign(for_sign + Ralipay.global_configs[:key])
         origin_params
       else
         false
@@ -332,8 +332,8 @@ module Ralipay
       posts = Ralipay::Common::para_filter(posts)
       for_sign = Ralipay::Common::create_link_string(posts)
       #for_sign = CGI.unescape for_sign
-      if sign == Ralipay::Common::md5_sign(for_sign + self.global_configs[:key])
-        response = open('http://notify.alipay.com/trade/notify_query.do?' + 'partner=' + self.global_configs[:partner] + '&notify_id=' + origin_params[:notify_id]).read
+      if sign == Ralipay::Common::md5_sign(for_sign + Ralipay.global_configs[:key])
+        response = open('http://notify.alipay.com/trade/notify_query.do?' + 'partner=' + Ralipay.global_configs[:partner] + '&notify_id=' + origin_params[:notify_id]).read
         response == 'true'
       else
         false
@@ -349,8 +349,8 @@ module Ralipay
       posts = Ralipay::Common::para_filter(posts)
       for_sign = Ralipay::Common::create_link_string(posts)
       #for_sign = CGI.unescape for_sign
-      if sign == Ralipay::Common::md5_sign(for_sign + self.global_configs[:key])
-        response = open('http://notify.alipay.com/trade/notify_query.do?' + 'partner=' + self.global_configs[:partner] + '&notify_id=' + origin_params[:notify_id]).read
+      if sign == Ralipay::Common::md5_sign(for_sign + Ralipay.global_configs[:key])
+        response = open('http://notify.alipay.com/trade/notify_query.do?' + 'partner=' + Ralipay.global_configs[:partner] + '&notify_id=' + origin_params[:notify_id]).read
         if response == 'true'
           origin_params
         else

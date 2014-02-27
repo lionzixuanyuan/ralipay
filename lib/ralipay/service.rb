@@ -33,7 +33,7 @@ class Service
                + '&sign='                                              \
                + CGI::escape(@@my_sign)                                \
                + '&sign_type='                                         \
-               + RaliSec_id
+               + Ralipay.sec_id
 
     #请求支付宝接口
     uri  = URI.parse (@@gateway_pay_channel + @@req_data)
